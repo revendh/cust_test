@@ -1,31 +1,29 @@
-name: Sync to Customer Repo (Post-PR Merge Only)
+name: Sync to Customer Repo
  
 on:
   push:
     branches:
-      - main   # ✅ ONLY trigger after merge to main
+      - main
  
 jobs:
   mirror:
     runs-on: ubuntu-latest
  
     steps:
-    - name: Checkout source repo
-      uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4.1.7
       with:
         fetch-depth: 0
+        persist-credentials: false   # ✅ CRITICAL FIX
  
     - name: Configure Git
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "actions@github.com"
+        git config --global user.name "revendh"
+        git config --global user.email "revendh@users.noreply.github.com"
  
-    - name: Add customer repo remote
+    - name: Push to customer repo
       env:
         TOKEN: ${{ secrets.TARGET_PAT }}
       run: |
-        git remote add customer https://$TOKEN@github.com/revendh/cust_test.git
+        git push https://x-access-token:$TOKEN@github.com/revendh/cust_test.git main
  
-    - name: Push ONLY main branch to customer repo
-      run: |
-        git push customer main
